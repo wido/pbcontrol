@@ -82,7 +82,7 @@ public class Game extends Thread {
             pollBlocker--;
 
             }
-	}
+    }
 
         /*
             We stoppen de timers, halen nog één maal de vlaggen scores
@@ -99,10 +99,10 @@ public class Game extends Thread {
     }
 
     /*
-	Er kan een timeReverse worden ingezet door een team, de GUI geeft dat hier door
-	0: blue base
-	1: red base
-	2: swing base
+    Er kan een timeReverse worden ingezet door een team, de GUI geeft dat hier door
+    0: blue base
+    1: red base
+    2: swing base
     */
     public void reverseFlag(int flag) {
         this.port.reverseFlag(flag);
@@ -113,8 +113,8 @@ public class Game extends Thread {
     }
 
     /*
-	Reset alle vlaggen naar 0 toe, dit gebeurd ook al als de game start.
-	Het kan wenselijk zijn dit tussendoor te doen, zodat er visueel kan worden gecontroleerd of alles werkt
+    Reset alle vlaggen naar 0 toe, dit gebeurd ook al als de game start.
+    Het kan wenselijk zijn dit tussendoor te doen, zodat er visueel kan worden gecontroleerd of alles werkt
     */
     public void reset() {
         this.port.reset();

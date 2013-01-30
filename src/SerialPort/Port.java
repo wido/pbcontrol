@@ -164,12 +164,12 @@ public class Port {
     }
 
     public void close() {
-	Logger.msg("Info", "Closing serial port.");
-	this.serialPort.close();
+    Logger.msg("Info", "Closing serial port.");
+    this.serialPort.close();
     }
 
     public void finalize() {
-	this.close();
+    this.close();
     }
 
     protected synchronized void handleReceivedScores(byte[] packet) {
@@ -186,35 +186,35 @@ public class Port {
             messagetype = packet[4];
             command     = packet[5];
             length      = packet[6];
-	    /* Op dit moment wordt er GEEN gebruik gemaakt van enige vorm van CRC */
-	    crc		= packet[length + 7];
+        /* Op dit moment wordt er GEEN gebruik gemaakt van enige vorm van CRC */
+        crc        = packet[length + 7];
 
-	    byte[] data =  new byte[length];
+        byte[] data =  new byte[length];
 
             for (int i = 0; i < length; i++) {
                 data[i] = packet[7 + i];
             }
             
-	    Logger.msg("Info", "Destination: " + destination + ", Sender: " + sender + ", Command: " + command);
+        Logger.msg("Info", "Destination: " + destination + ", Sender: " + sender + ", Command: " + command);
 
             if (destination == 0) {
                 switch (command) {
                     case 32:
                         switch (sender) {
                             case 1:
-				this.score.setBlueBaseScore(data[6], (int)(data[2] << 8 | data[3] & 0xFF), (int)(data[4] << 8 | data[5] & 0xFF));
-				break;
+                this.score.setBlueBaseScore(data[6], (int)(data[2] << 8 | data[3] & 0xFF), (int)(data[4] << 8 | data[5] & 0xFF));
+                break;
                             case 2:
-				this.score.setRedBaseScore(data[6], (int)(data[2] << 8 | data[3] & 0xFF), (int)(data[4] << 8 | data[5] & 0xFF));
-				break;
+                this.score.setRedBaseScore(data[6], (int)(data[2] << 8 | data[3] & 0xFF), (int)(data[4] << 8 | data[5] & 0xFF));
+                break;
                             case 3:
-				this.score.setSwingBaseScore(data[6], (int)(data[2] << 8 | data[3] & 0xFF), (int)(data[4] << 8 | data[5] & 0xFF));
+                this.score.setSwingBaseScore(data[6], (int)(data[2] << 8 | data[3] & 0xFF), (int)(data[4] << 8 | data[5] & 0xFF));
                                 break;
 
                             default:
                                 Logger.msg("Warn", "Received a packet with wrong sender (" + sender + "), please check the dipswitches!");
                                 break;
-			  }
+              }
                         break;
 
                     default:
@@ -223,68 +223,68 @@ public class Port {
 
             }
 
-	    Logger.msg("Info", "Finished processing packet");
+        Logger.msg("Info", "Finished processing packet");
 
     }
 
     public static class ScoreReader implements SerialPortEventListener {
 
-	private InputStream in;
-	private byte[] buffer = new byte[32];
-	private Port port;
+    private InputStream in;
+    private byte[] buffer = new byte[32];
+    private Port port;
         
-	public ScoreReader (InputStream in, Port port) {
-	    this.in = in;
-	    this.port = port;
-	}
+    public ScoreReader (InputStream in, Port port) {
+        this.in = in;
+        this.port = port;
+    }
         
-	public synchronized void serialEvent(SerialPortEvent arg0) {
-	  int data;
+    public synchronized void serialEvent(SerialPortEvent arg0) {
+      int data;
 
-	  try {
-	    int len = 0;
-	    boolean validPacket = true;
+      try {
+        int len = 0;
+        boolean validPacket = true;
 
-	    while ((data = in.read()) > -1) {
+        while ((data = in.read()) > -1) {
 
-	      /* Als het eerste pakket geen 0xFF (255) bevat, dan is het geen volledig pakket */
-	      if (len == 0 && data != 238) {
-		Logger.msg("Warn", "Corrupt packet received, did not start with 0xFF!");
-		validPacket = false;
-	      } else {
-		buffer[len++] = (byte) data;
+          /* Als het eerste pakket geen 0xFF (255) bevat, dan is het geen volledig pakket */
+          if (len == 0 && data != 238) {
+        Logger.msg("Warn", "Corrupt packet received, did not start with 0xFF!");
+        validPacket = false;
+          } else {
+        buffer[len++] = (byte) data;
 
-		/* End of packet, verwerk het ingekomen pakket */
-		if (data == 204) {
-		  break;
-		}
+        /* End of packet, verwerk het ingekomen pakket */
+        if (data == 204) {
+          break;
+        }
 
-	      }
+          }
 
-	    }
+        }
 
-	    if (validPacket) {
-	      Logger.msg("Info", "Received packet: " + port.hexToString(buffer));
-	      port.handleReceivedScores(buffer);
-	    }
+        if (validPacket) {
+          Logger.msg("Info", "Received packet: " + port.hexToString(buffer));
+          port.handleReceivedScores(buffer);
+        }
 
-	  } catch ( IOException e ) {
-	    e.printStackTrace();
-	  }             
-	}
+      } catch ( IOException e ) {
+        e.printStackTrace();
+      }             
+    }
     }
 
     protected String hexToString(byte[] packet) {
-	String hexString = "";
-	for (int i = 0; i < packet.length; i++) {
-	    if (packet[i] == 204) {
-		break;
-	    }
-	    String hex = "0x";
-	    hex += Integer.toHexString(packet[i]).toUpperCase();
-	    hexString += hex + " ";
-	}
-	return hexString;
+    String hexString = "";
+    for (int i = 0; i < packet.length; i++) {
+        if (packet[i] == 204) {
+        break;
+        }
+        String hex = "0x";
+        hex += Integer.toHexString(packet[i]).toUpperCase();
+        hexString += hex + " ";
+    }
+    return hexString;
     }
 
 

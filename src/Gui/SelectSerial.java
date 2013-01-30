@@ -18,7 +18,7 @@ public class SelectSerial extends JApplet {
     }
     
     public void init() {  
-	
+    
         for(int i = 0; i < availablePorts.length; i++) {
             String item = availablePorts[count++];
             /* Do not add empty items */
@@ -47,7 +47,7 @@ public class SelectSerial extends JApplet {
     }
 
     public String getSelection() {
-	  return this.serialPort;
+      return this.serialPort;
     }
     
     public static void run(SelectSerial applet) {

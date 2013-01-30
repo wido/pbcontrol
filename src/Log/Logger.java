@@ -8,17 +8,17 @@ public class Logger {
     public Logger() {}
     
     public static void msg(String facility, String msg) {
-	System.out.println(facility + ": " + msg);
-	lines[arrayLength++] = facility + ": " + msg;
+    System.out.println(facility + ": " + msg);
+    lines[arrayLength++] = facility + ": " + msg;
     }
 
     public static String[] getLines() {
-	return lines;
+    return lines;
     }
 
     public static void clearLines() {
-	lines = new String[255];
-	arrayLength = 0;
+    lines = new String[255];
+    arrayLength = 0;
     }
 
 }
