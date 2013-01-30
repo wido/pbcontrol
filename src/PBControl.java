@@ -71,6 +71,7 @@ class PBControl {
         Logger.msg("Info", "Initializing settings");
         settings.setRoundTime(60);
         settings.setRespawnTime(10);
+        settings.setCountdownTime(10);
         settings.load();
         Logger.msg("Info", "Game settings loaded. RoundTime: (" + settings.getRoundTime() + "), RespawnTime: (" + settings.getRespawnTime() + ")");
 
