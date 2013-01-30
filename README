@@ -7,9 +7,10 @@ and the Belgian Scenario Competition.
 
 This software is open source, but the hardware design for the system is not.
 
-** Swing **
-Dropdown: http://www.java2s.com/Code/Java/Swing-JFC/Usingdropdownlists.htm
+** Building **
+Building is done by using Ant, simply run 'ant' in the src directory and it will
+build the system
 
-** ini4j **
-Read ini file: http://ini4j.sourceforge.net/tutorial/IniTutorial.java.html
-
+** Running **
+PBControl depends on the Java library RXTX to run, so on your system these libraries
+have to be installed.
