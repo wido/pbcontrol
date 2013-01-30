@@ -25,22 +25,34 @@ public class Score {
     */
     public synchronized void setBlueBaseScore(int color, int blue, int red) {
         this.blueBaseScore[0] = color;
-        this.blueBaseScore[1] = blue;
-        this.blueBaseScore[2] = red;
+        if (blue >= this.blueBaseScore[1]) {
+            this.blueBaseScore[1] = blue;
+        }
+        if (red >= this.blueBaseScore[2]) {
+            this.blueBaseScore[2] = red;
+        }
         this.blueBasePing++;
     }
 
     public synchronized void setRedBaseScore(int color, int blue, int red) {
         this.redBaseScore[0] = color;
-        this.redBaseScore[1] = blue;
-        this.redBaseScore[2] = red;
+        if (blue >= this.redBaseScore[1]) {
+            this.redBaseScore[1] = blue;
+        }
+        if (red >= this.redBaseScore[2]) {
+            this.redBaseScore[2] = red;
+        }
         this.redBasePing++;
     }
 
     public synchronized void setSwingBaseScore(int color, int blue, int red) {
         this.swingBaseScore[0] = color;
-        this.swingBaseScore[1] = blue;
-        this.swingBaseScore[2] = red;
+        if (blue >= this.swingBaseScore[1]) {
+            this.swingBaseScore[1] = blue;
+        }
+        if (red >= this.swingBaseScore[2]) {
+            this.swingBaseScore[2] = red;
+        }
         this.swingBasePing++;
     }
 
