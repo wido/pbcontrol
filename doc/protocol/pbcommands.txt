@@ -1,0 +1,3 @@
+EE FF FF 00 00 11 01 01 00 EE CC = Start game
+EE FF FF 00 00 11 01 02 00 EE CC = Stop game
+EE FF FF 00 00 11 01 03 00 EE CC = Reset game

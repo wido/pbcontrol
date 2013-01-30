@@ -1,0 +1,38 @@
+<project name="PBControl" default="postjar">
+    <target name="clean">
+        <delete dir="build"/>
+    </target>
+
+    <target name="compile" depends="clean">
+        <mkdir dir="build/classes"/>
+        <javac srcdir="." destdir="build/classes">
+            <classpath>
+                <pathelement path="${classpath}"/>
+                <pathelement location="lib/RXTXcomm.jar"/>
+                <pathelement location="lib/ini4j-0.5.1.jar"/>
+                <pathelement location="lib/iText-5.0.1.jar" />
+            </classpath>
+        </javac>
+    </target>
+
+    <target name="jar" depends="compile">
+        <mkdir dir="build/jar"/>
+        <jar destfile="build/jar/PBControl.jar" basedir="build/classes">
+            <zipfileset src="lib/RXTXcomm.jar" />
+            <zipfileset src="lib/ini4j-0.5.1.jar" />
+            <zipfileset src="lib/iText-5.0.1.jar" />
+            <fileset dir="." casesensitive="yes">
+                <include name="resource/fonts/*"/>
+            </fileset>
+
+            <manifest>
+                <attribute name="Main-Class" value="PBControl"/>
+            </manifest>
+        </jar>
+    </target>
+    
+    <target name="postjar" depends="jar">
+        <delete dir="build/classes"/>
+    </target>
+    
+</project>
