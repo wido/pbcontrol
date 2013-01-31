@@ -13,7 +13,7 @@ public class Port {
 
     private SerialPort serialPort;
     private String port;
-    private int baudrate = 4800;
+    private int baudrate;
     private InputStream inputStream;
     private OutputStream outputStream;
     private Score score;

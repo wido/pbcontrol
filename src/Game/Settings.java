@@ -9,6 +9,7 @@ public class Settings {
     private int roundTime;
     private int respawnTime;
     private int countdownTime;
+    private int baudRate;
     private String settingsFile;
     private int windowWidth, windowHeigth;
 
@@ -51,6 +52,7 @@ public class Settings {
             ini.put("game", "countdowntime", this.countdownTime);
             ini.put("game", "windowwidth", this.windowWidth);
             ini.put("game", "windowheigth", this.windowHeigth);
+            ini.put("serial", "baudrate", this.baudRate);
             ini.store();
         } catch (IOException e) {
             Logger.msg("Warn", "Couldn't save settings, message was: " + e.getMessage());
@@ -68,6 +70,7 @@ public class Settings {
             this.countdownTime = ini.get("game", "countdowntime", int.class);
             this.windowWidth = ini.get("game", "windowwidth", int.class);
             this.windowHeigth = ini.get("game", "windowheigth", int.class);
+            this.baudRate = ini.get("serial", "baudrate", int.class);
         } catch (IOException e) {
             Logger.msg("Warn", "Couldn't load settings, message was: " + e.getMessage());
             return false;
@@ -88,6 +91,10 @@ public class Settings {
         return this.countdownTime;
     }
 
+    public int getBaudRate() {
+        return this.baudRate;
+    }
+
     public void setRoundTime(int roundTime) {
         this.roundTime = roundTime;
     }
@@ -98,6 +105,10 @@ public class Settings {
 
     public void setCountdownTime(int countdownTime) {
         this.countdownTime = countdownTime;
+    }
+
+    public void setBaudRate(int baudRate) {
+        this.baudRate = baudRate;
     }
 
     public int getWindowWidth() {

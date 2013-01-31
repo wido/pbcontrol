@@ -69,13 +69,14 @@ class PBControl {
         /* Settings laden en daarbij ook twee default waarden zetten */
         Settings settings = new Settings();
         Logger.msg("Info", "Initializing settings");
+        settings.setBaudRate(4800);
         settings.setRoundTime(60);
         settings.setRespawnTime(10);
         settings.setCountdownTime(10);
         settings.load();
         Logger.msg("Info", "Game settings loaded. RoundTime: (" + settings.getRoundTime() + "), RespawnTime: (" + settings.getRespawnTime() + ")");
 
-        Control control = new Control(settings, new Port(serialPort));
+        Control control = new Control(settings, new Port(serialPort, settings.getBaudRate()));
 
         MainGUI maingui = new MainGUI();
         maingui.run(maingui, control);
