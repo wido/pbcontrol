@@ -37,10 +37,10 @@ public class Settings {
         if (!file.exists()) {
             Logger.msg("Info", "Creating settings file (" + this.settingsFile + ")");
             try {
-            file.createNewFile();
+                file.createNewFile();
             } catch (IOException e) {
-            Logger.msg("Warn", "Couldn't create settings file, message was: " + e.getMessage());
-            return false;
+                Logger.msg("Warn", "Couldn't create settings file, message was: " + e.getMessage());
+                return false;
             }
         }
 
