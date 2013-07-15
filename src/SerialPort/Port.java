@@ -202,13 +202,13 @@ public class Port {
                     case 32:
                         switch (sender) {
                             case 1:
-                this.score.setBlueBaseScore(data[6], (int)(data[2] << 8 | data[3] & 0xFF), (int)(data[4] << 8 | data[5] & 0xFF));
-                break;
+                                this.score.setBlueBaseScore(data[6], (int)(data[2] << 8 | data[3] & 0xFF), (int)(data[4] << 8 | data[5] & 0xFF));
+                                break;
                             case 2:
-                this.score.setRedBaseScore(data[6], (int)(data[2] << 8 | data[3] & 0xFF), (int)(data[4] << 8 | data[5] & 0xFF));
-                break;
+                                this.score.setRedBaseScore(data[6], (int)(data[2] << 8 | data[3] & 0xFF), (int)(data[4] << 8 | data[5] & 0xFF));
+                                break;
                             case 3:
-                this.score.setSwingBaseScore(data[6], (int)(data[2] << 8 | data[3] & 0xFF), (int)(data[4] << 8 | data[5] & 0xFF));
+                                this.score.setSwingBaseScore(data[6], (int)(data[2] << 8 | data[3] & 0xFF), (int)(data[4] << 8 | data[5] & 0xFF));
                                 break;
 
                             default:
