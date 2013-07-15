@@ -186,41 +186,58 @@ public class Port {
             messagetype = packet[4];
             command     = packet[5];
             length      = packet[6];
-        /* Op dit moment wordt er GEEN gebruik gemaakt van enige vorm van CRC */
-        crc        = packet[length + 7];
+            /* Op dit moment wordt er GEEN gebruik gemaakt van enige vorm van CRC */
+            crc        = packet[length + 7];
 
-        byte[] data =  new byte[length];
+            byte[] data =  new byte[length];
 
             for (int i = 0; i < length; i++) {
                 data[i] = packet[7 + i];
             }
-            
-        Logger.msg("Info", "Destination: " + destination + ", Sender: " + sender + ", Command: " + command);
+
+            Logger.msg("Info", "Destination: " + destination + ", Sender: " + sender + ", Command: " + command);
+
+            int color = (int) data[6];
+            int blueScore = (int)(data[2] << 8 | data[3] & 0xFF);
+            int redScore = (int)(data[4] << 8 | data[5] & 0xFF);
+
+            /*
+                Sometimes data comes in corrupted, not sure why
+                Valid ranges for scores are one hour at maximum
+            */
+            if (blueScore > 3600) {
+                Logger.msg("Info", "Received invalid (" + blueScore + ") blue score from " + sender + ". Ignoring.");
+                return;
+            }
+
+            if (redScore > 3600) {
+                Logger.msg("Info", "Received invalid (" + redScore + ") red score from " + sender + ". Ignoring.");
+                return;
+            }
 
             if (destination == 0) {
                 switch (command) {
                     case 32:
                         switch (sender) {
                             case 1:
-                                this.score.setBlueBaseScore(data[6], (int)(data[2] << 8 | data[3] & 0xFF), (int)(data[4] << 8 | data[5] & 0xFF));
+                                this.score.setBlueBaseScore(color, blueScore, redScore);
                                 break;
                             case 2:
-                                this.score.setRedBaseScore(data[6], (int)(data[2] << 8 | data[3] & 0xFF), (int)(data[4] << 8 | data[5] & 0xFF));
+                                this.score.setRedBaseScore(color, blueScore, redScore);
                                 break;
                             case 3:
-                                this.score.setSwingBaseScore(data[6], (int)(data[2] << 8 | data[3] & 0xFF), (int)(data[4] << 8 | data[5] & 0xFF));
+                                this.score.setSwingBaseScore(color, blueScore, redScore);
                                 break;
 
                             default:
                                 Logger.msg("Warn", "Received a packet with wrong sender (" + sender + "), please check the dipswitches!");
                                 break;
-              }
+                            }
                         break;
 
                     default:
                         break;
                 }
-
             }
 
         Logger.msg("Info", "Finished processing packet");
