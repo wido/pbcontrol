@@ -68,21 +68,19 @@ public class Game extends Thread {
 
             /* Pas als de countdown voorbij is gaan we vlaggen pollen */
             if (remainingCountdownTime == 0) {
-
-            /*
-            Poll de vlaggen voor hun data
-            Hierbij moeten we voorkomen dat we de vlaggen overspoelen met data,
-            daarom niet elke 800ms pollen
-            */
-            if (pollBlocker == 0) {
-                this.port.poll();
-                this.score.pingRequest();
-                pollBlocker = 3;
+                /*
+                Poll de vlaggen voor hun data
+                Hierbij moeten we voorkomen dat we de vlaggen overspoelen met data,
+                daarom niet elke 800ms pollen
+                */
+                if (pollBlocker == 0) {
+                    this.port.poll();
+                    this.score.pingRequest();
+                    pollBlocker = 3;
+                }
+                pollBlocker--;
             }
-            pollBlocker--;
-
-            }
-    }
+        }
 
         /*
             We stoppen de timers, halen nog één maal de vlaggen scores
