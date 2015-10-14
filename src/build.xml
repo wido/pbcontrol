@@ -16,7 +16,6 @@
                 <pathelement path="${classpath}"/>
                 <pathelement location="${lib.dir}/RXTXcomm.jar"/>
                 <pathelement location="${lib.dir}/ini4j-0.5.2.jar"/>
-                <pathelement location="${lib.dir}/iText-5.0.1.jar" />
             </classpath>
         </javac>
     </target>
@@ -26,7 +25,6 @@
         <jar destfile="${jar.dir}/${ant.project.name}.jar" basedir="${classes.dir}">
             <zipfileset src="${lib.dir}/RXTXcomm.jar" />
             <zipfileset src="${lib.dir}/ini4j-0.5.2.jar" />
-            <zipfileset src="${lib.dir}/iText-5.0.1.jar" />
             <fileset dir="." casesensitive="yes">
                 <include name="resource/fonts/*"/>
             </fileset>
