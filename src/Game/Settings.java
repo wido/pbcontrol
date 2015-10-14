@@ -31,7 +31,6 @@ public class Settings {
         }
 
         this.settingsFile = settingsDir + "/settings.ini";
-
     }
 
     public Boolean save() {
@@ -59,6 +58,7 @@ public class Settings {
             ini.put("serial", "baudrate", this.baudRate);
             ini.put("serial", "sender", this.sender);
             ini.store();
+            Logger.msg("Info", "Saved settings in: " + file.getPath());
         } catch (IOException e) {
             Logger.msg("Warn", "Couldn't save settings, message was: " + e.getMessage());
             return false;
@@ -69,6 +69,7 @@ public class Settings {
 
     public Boolean load() {
         try {
+            Logger.msg("Info", "Loading settings from: " + this.settingsFile);
             Ini ini = new Ini(new File(this.settingsFile));
             this.roundTime = ini.get("game", "roundtime", int.class);
             this.respawnTime = ini.get("game", "respawntime", int.class);
