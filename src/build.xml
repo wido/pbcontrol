@@ -15,7 +15,7 @@
             <classpath>
                 <pathelement path="${classpath}"/>
                 <pathelement location="${lib.dir}/RXTXcomm.jar"/>
-                <pathelement location="${lib.dir}/ini4j-0.5.2.jar"/>
+                <pathelement location="${lib.dir}/ini4j-0.5.4.jar"/>
             </classpath>
         </javac>
     </target>
@@ -24,7 +24,7 @@
         <mkdir dir="${jar.dir}"/>
         <jar destfile="${jar.dir}/${ant.project.name}.jar" basedir="${classes.dir}">
             <zipfileset src="${lib.dir}/RXTXcomm.jar" />
-            <zipfileset src="${lib.dir}/ini4j-0.5.2.jar" />
+            <zipfileset src="${lib.dir}/ini4j-0.5.4.jar" />
             <fileset dir="." casesensitive="yes">
                 <include name="resource/fonts/*"/>
             </fileset>
