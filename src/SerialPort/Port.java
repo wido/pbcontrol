@@ -1,19 +1,23 @@
 package SerialPort;
 
-import gnu.io.*;
-import java.util.*;
-import Log.Logger;
-import Game.Score;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.FileDescriptor;
-import java.io.IOException;
+import java.util.Enumeration;
+
+import Game.Score;
+import Log.Logger;
+import gnu.io.CommPortIdentifier;
+import gnu.io.SerialPort;
+import gnu.io.SerialPortEvent;
+import gnu.io.SerialPortEventListener;
 
 public class Port {
 
     private SerialPort serialPort;
     private String port;
     private int baudrate;
+    private int sender;
     private InputStream inputStream;
     private OutputStream outputStream;
     private Score score;
@@ -29,7 +33,7 @@ public class Port {
         while (portList.hasMoreElements()) {
             portId = (CommPortIdentifier) portList.nextElement();
 
-            /* We willen alleen serieële poorten */
+            /* We willen alleen serieele poorten */
             if (portId.getPortType() == CommPortIdentifier.PORT_SERIAL) {
                 ports[i] = portId.getName();
                 i++;
@@ -46,11 +50,12 @@ public class Port {
         this.port = port;
     }
 
-    public Port(String port, int baudrate) {
+    public Port(String port, int baudrate, int sender) {
         this.port = port;
         this.baudrate = baudrate;
+        this.sender = sender;
     }
-   
+
     public void setScoreObject(Score score) {
         this.score = score;
     }
@@ -71,7 +76,7 @@ public class Port {
             this.serialPort.addEventListener(new ScoreReader(this.inputStream, this));
             this.serialPort.notifyOnDataAvailable(true);
 
-            Logger.msg("Info", "Opened serial port: " + this.port + " with baudrate: " + this.baudrate);
+            Logger.msg("Info", "Opened serial port: " + this.port + " with baudrate: " + this.baudrate + " and sender: " + this.sender);
 
         } catch (Exception e) {
             Logger.msg("Error", "Could not open " + this.port + " the message was: " + e.getMessage());
@@ -79,22 +84,20 @@ public class Port {
     }
 
     private void sendPacket(byte[] packetLoad) {
-
         try {
-        this.outputStream.write(packetLoad);
-        this.outputStream.flush();
+            this.outputStream.write(packetLoad);
+            this.outputStream.flush();
 
-        Logger.msg("Info", "Sending: " + this.hexToString(packetLoad));
+            Logger.msg("Info", "Sending: " + this.hexToString(packetLoad));
         } catch (Exception e) {
-        Logger.msg("Error", "Could not send packet, the message was: " + e.getMessage());
+            Logger.msg("Error", "Could not send packet, the message was: " + e.getMessage());
         }
-
     }
 
     /* Stuur start commando naar alle vlaggen */
     public void roundStart() {
         Logger.msg("Info", "Sending start signal to all flags");
-        byte[] startGame = { (byte)238, (byte)255, (byte)255, 0, 0, 17, 1, 1, 0, (byte)238, (byte)204 };
+        byte[] startGame = { (byte)238, (byte)255, (byte)255, (byte)sender, 0, 17, 1, 1, 0, (byte)238, (byte)204 };
         /* Uit veiligheid sturen we een start en stop 3 keer */
         for (int i = 0; i < 3; i++) {
             this.sendPacket(startGame);
@@ -104,7 +107,7 @@ public class Port {
     /* Stuur het stop commando naar alle vlaggen */
     public void roundEnd() {
         Logger.msg("Info", "Sending stop signal to all flags");
-        byte[] stopGame = { (byte)238, (byte)255, (byte)255, 0, 0, 17, 1, 2, 0, (byte)238, (byte)204 };
+        byte[] stopGame = { (byte)238, (byte)255, (byte)255, (byte)sender, 0, 17, 1, 2, 0, (byte)238, (byte)204 };
         /* Uit veiligheid sturen we een start en stop 3 keer */
         for (int i = 0; i < 3; i++) {
             this.sendPacket(stopGame);
@@ -117,19 +120,19 @@ public class Port {
     /* Reset de vlaggen, alles op 0 */
     public void reset() {
         Logger.msg("Info", "Resetting all flags");
-        byte[] resetGame = { (byte)238, (byte)255, (byte)255, 0, 0, 17, 1, 3, 0, (byte)238, (byte)204 };
+        byte[] resetGame = { (byte)238, (byte)255, (byte)255, (byte)sender, 0, 17, 1, 3, 0, (byte)238, (byte)204 };
         this.sendPacket(resetGame);
     }
 
     public void reverseFlag(int destination) {
         Logger.msg("Info", "Sending timereverse to flag: " + destination);
-        byte[] reverseFlag = { (byte)238, (byte)255, (byte)destination, 0, 0, 64, 1, 3, 0, (byte)238, (byte)204 };
+        byte[] reverseFlag = { (byte)238, (byte)255, (byte)destination, (byte)sender, 0, 64, 1, 3, 0, (byte)238, (byte)204 };
         this.sendPacket(reverseFlag);
     }
 
     public void freezeFlag(int destination) {
         Logger.msg("Info", "Sending freeze to flag: " + destination);
-        byte[] freezeFlag = { (byte)238, (byte)255, (byte)destination, 0, 0, 64, 1, 0, 0, (byte)238, (byte)204 };
+        byte[] freezeFlag = { (byte)238, (byte)255, (byte)destination, (byte)sender, 0, 64, 1, 0, 0, (byte)238, (byte)204 };
         this.sendPacket(freezeFlag);
     }
 
@@ -141,9 +144,9 @@ public class Port {
         short sRespawnTime = new Integer(respawntime).shortValue();
         short sCountDownTime = new Integer(countdowntime).shortValue();
 
-        byte[] roundTimePacket = { (byte)238, (byte)255, (byte)255, 0, 2, 16, 4, 0, 1, (byte)(sRoundTime >> 8), (byte)sRoundTime, 0, (byte)238, (byte)204 };
-        byte[] respawnTimePacket = { (byte)238, (byte)255, (byte)255, 0, 2, 16, 4, 1, 1, (byte)(sRespawnTime >> 8), (byte)sRespawnTime, 0, (byte)238, (byte)204 };
-        byte[] countdownTimePacket = { (byte)238, (byte)255, (byte)255, 0, 2, 16, 4, 2, 0, (byte)(sCountDownTime >> 8), (byte)sCountDownTime, 0, (byte)238, (byte)204 };
+        byte[] roundTimePacket = { (byte)238, (byte)255, (byte)255, (byte)sender, 2, 16, 4, 0, 1, (byte)(sRoundTime >> 8), (byte)sRoundTime, 0, (byte)238, (byte)204 };
+        byte[] respawnTimePacket = { (byte)238, (byte)255, (byte)255, (byte)sender, 2, 16, 4, 1, 1, (byte)(sRespawnTime >> 8), (byte)sRespawnTime, 0, (byte)238, (byte)204 };
+        byte[] countdownTimePacket = { (byte)238, (byte)255, (byte)255, (byte)sender, 2, 16, 4, 2, 0, (byte)(sCountDownTime >> 8), (byte)sCountDownTime, 0, (byte)238, (byte)204 };
 
         this.sendPacket(roundTimePacket);
         try {
@@ -159,150 +162,145 @@ public class Port {
     }
 
     public void poll() {
-      byte[] pollPacket = { (byte)238, (byte)255, (byte)255, 0, 1, 32, 0, 0, (byte)238, (byte)204 };
-      this.sendPacket(pollPacket);
+        byte[] pollPacket = { (byte)238, (byte)255, (byte)255, (byte)sender, 1, 32, 0, 0, (byte)238, (byte)204 };
+        this.sendPacket(pollPacket);
     }
 
     public void close() {
-    Logger.msg("Info", "Closing serial port.");
-    this.serialPort.close();
+        Logger.msg("Info", "Closing serial port.");
+        this.serialPort.close();
     }
 
     public void finalize() {
-    this.close();
+        this.close();
     }
 
     protected synchronized void handleReceivedScores(byte[] packet) {
+        byte sender;
+        byte destination;
+        byte messagetype;
+        byte command;
+        byte length;
+        byte crc;
 
-            byte sender;
-            byte destination;
-            byte messagetype;
-            byte command;
-            byte length;
-            byte crc;
+        destination = packet[2];
+        sender      = packet[3];
+        messagetype = packet[4];
+        command     = packet[5];
+        length      = packet[6];
+        /* Op dit moment wordt er GEEN gebruik gemaakt van enige vorm van CRC */
+        crc        = packet[length + 7];
 
-            destination = packet[2];
-            sender      = packet[3];
-            messagetype = packet[4];
-            command     = packet[5];
-            length      = packet[6];
-            /* Op dit moment wordt er GEEN gebruik gemaakt van enige vorm van CRC */
-            crc        = packet[length + 7];
+        byte[] data =  new byte[length];
 
-            byte[] data =  new byte[length];
+        for (int i = 0; i < length; i++) {
+            data[i] = packet[7 + i];
+        }
 
-            for (int i = 0; i < length; i++) {
-                data[i] = packet[7 + i];
-            }
+        Logger.msg("Info", "Destination: " + destination + ", Sender: " + sender + ", Command: " + command);
 
-            Logger.msg("Info", "Destination: " + destination + ", Sender: " + sender + ", Command: " + command);
+        int color = (int) data[6];
+        int blueScore = (int)(data[2] << 8 | data[3] & 0xFF);
+        int redScore = (int)(data[4] << 8 | data[5] & 0xFF);
 
-            int color = (int) data[6];
-            int blueScore = (int)(data[2] << 8 | data[3] & 0xFF);
-            int redScore = (int)(data[4] << 8 | data[5] & 0xFF);
-
-            /*
+        /*
                 Sometimes data comes in corrupted, not sure why
                 Valid ranges for scores are one hour at maximum
-            */
-            if (blueScore > 3600) {
-                Logger.msg("Info", "Received invalid (" + blueScore + ") blue score from " + sender + ". Ignoring.");
-                return;
-            }
+         */
+        if (blueScore > 3600) {
+            Logger.msg("Info", "Received invalid (" + blueScore + ") blue score from " + sender + ". Ignoring.");
+            return;
+        }
 
-            if (redScore > 3600) {
-                Logger.msg("Info", "Received invalid (" + redScore + ") red score from " + sender + ". Ignoring.");
-                return;
-            }
+        if (redScore > 3600) {
+            Logger.msg("Info", "Received invalid (" + redScore + ") red score from " + sender + ". Ignoring.");
+            return;
+        }
 
-            if (destination == 0) {
-                switch (command) {
-                    case 32:
-                        switch (sender) {
-                            case 1:
-                                this.score.setBlueBaseScore(color, blueScore, redScore);
-                                break;
-                            case 2:
-                                this.score.setRedBaseScore(color, blueScore, redScore);
-                                break;
-                            case 3:
-                                this.score.setSwingBaseScore(color, blueScore, redScore);
-                                break;
+        if (destination == 0) {
+            switch (command) {
+            case 32:
+                switch (sender) {
+                case 1:
+                    this.score.setBlueBaseScore(color, blueScore, redScore);
+                    break;
+                case 2:
+                    this.score.setRedBaseScore(color, blueScore, redScore);
+                    break;
+                case 3:
+                    this.score.setSwingBaseScore(color, blueScore, redScore);
+                    break;
 
-                            default:
-                                Logger.msg("Warn", "Received a packet with wrong sender (" + sender + "), please check the dipswitches!");
-                                break;
-                            }
-                        break;
-
-                    default:
-                        break;
+                default:
+                    Logger.msg("Warn", "Received a packet with wrong sender (" + sender + "), please check the dipswitches!");
+                    break;
                 }
+                break;
+
+            default:
+                break;
             }
+        }
 
         Logger.msg("Info", "Finished processing packet");
-
     }
 
     public static class ScoreReader implements SerialPortEventListener {
 
-    private InputStream in;
-    private byte[] buffer = new byte[32];
-    private Port port;
-        
-    public ScoreReader (InputStream in, Port port) {
-        this.in = in;
-        this.port = port;
-    }
-        
-    public synchronized void serialEvent(SerialPortEvent arg0) {
-      int data;
+        private InputStream in;
+        private byte[] buffer = new byte[32];
+        private Port port;
 
-      try {
-        int len = 0;
-        boolean validPacket = true;
-
-        while ((data = in.read()) > -1) {
-
-          /* Als het eerste pakket geen 0xFF (255) bevat, dan is het geen volledig pakket */
-          if (len == 0 && data != 238) {
-        Logger.msg("Warn", "Corrupt packet received, did not start with 0xFF!");
-        validPacket = false;
-          } else {
-        buffer[len++] = (byte) data;
-
-        /* End of packet, verwerk het ingekomen pakket */
-        if (data == 204) {
-          break;
+        public ScoreReader (InputStream in, Port port) {
+            this.in = in;
+            this.port = port;
         }
 
-          }
+        public synchronized void serialEvent(SerialPortEvent arg0) {
+            int data;
 
+            try {
+                int len = 0;
+                boolean validPacket = true;
+
+                while ((data = in.read()) > -1) {
+                    /* Als het eerste pakket geen 0xFF (255) bevat, dan is het geen volledig pakket */
+                    if (len == 0 && data != 238) {
+                        Logger.msg("Warn", "Corrupt packet received, did not start with 0xFF!");
+                        validPacket = false;
+                    } else {
+                        buffer[len++] = (byte) data;
+
+                        /* End of packet, verwerk het ingekomen pakket */
+                        if (data == 204) {
+                            break;
+                        }
+
+                    }
+
+                }
+
+                if (validPacket) {
+                    Logger.msg("Info", "Received packet: " + port.hexToString(buffer));
+                    port.handleReceivedScores(buffer);
+                }
+
+            } catch ( IOException e ) {
+                e.printStackTrace();
+            }             
         }
-
-        if (validPacket) {
-          Logger.msg("Info", "Received packet: " + port.hexToString(buffer));
-          port.handleReceivedScores(buffer);
-        }
-
-      } catch ( IOException e ) {
-        e.printStackTrace();
-      }             
-    }
     }
 
     protected String hexToString(byte[] packet) {
-    String hexString = "";
-    for (int i = 0; i < packet.length; i++) {
-        if (packet[i] == 204) {
-        break;
+        String hexString = "";
+        for (int i = 0; i < packet.length; i++) {
+            if (packet[i] == 204) {
+                break;
+            }
+            String hex = "0x";
+            hex += Integer.toHexString(packet[i]).toUpperCase();
+            hexString += hex + " ";
         }
-        String hex = "0x";
-        hex += Integer.toHexString(packet[i]).toUpperCase();
-        hexString += hex + " ";
+        return hexString;
     }
-    return hexString;
-    }
-
-
 }

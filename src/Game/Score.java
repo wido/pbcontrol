@@ -22,7 +22,7 @@ public class Score {
       1: de blauwe score
       2: de rode score
 
-    */
+     */
     public synchronized void setBlueBaseScore(int color, int blue, int red) {
         this.blueBaseScore[0] = color;
         if (blue >= this.blueBaseScore[1]) {

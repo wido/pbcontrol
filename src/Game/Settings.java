@@ -1,7 +1,10 @@
 package Game;
 
-import java.io.*;
-import org.ini4j.*;
+import java.io.File;
+import java.io.IOException;
+
+import org.ini4j.Ini;
+
 import Log.Logger;
 
 public class Settings {
@@ -10,6 +13,7 @@ public class Settings {
     private int respawnTime;
     private int countdownTime;
     private int baudRate;
+    private int sender;
     private String settingsFile;
     private int windowWidth, windowHeigth;
 
@@ -53,6 +57,7 @@ public class Settings {
             ini.put("game", "windowwidth", this.windowWidth);
             ini.put("game", "windowheigth", this.windowHeigth);
             ini.put("serial", "baudrate", this.baudRate);
+            ini.put("serial", "sender", this.sender);
             ini.store();
         } catch (IOException e) {
             Logger.msg("Warn", "Couldn't save settings, message was: " + e.getMessage());
@@ -71,6 +76,7 @@ public class Settings {
             this.windowWidth = ini.get("game", "windowwidth", int.class);
             this.windowHeigth = ini.get("game", "windowheigth", int.class);
             this.baudRate = ini.get("serial", "baudrate", int.class);
+            this.sender = ini.get("serial", "sender", int.class);
         } catch (IOException e) {
             Logger.msg("Warn", "Couldn't load settings, message was: " + e.getMessage());
             return false;
@@ -95,6 +101,10 @@ public class Settings {
         return this.baudRate;
     }
 
+    public int getSender() {
+        return this.sender;
+    }
+
     public void setRoundTime(int roundTime) {
         this.roundTime = roundTime;
     }
@@ -109,6 +119,10 @@ public class Settings {
 
     public void setBaudRate(int baudRate) {
         this.baudRate = baudRate;
+    }
+
+    public void setSender(int sender) {
+        this.sender = sender;
     }
 
     public int getWindowWidth() {

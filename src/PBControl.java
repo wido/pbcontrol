@@ -1,8 +1,9 @@
-import SerialPort.Port;
-import Log.*;
-import Game.Game;
 import Game.Settings;
-import Gui.*;
+import Gui.Control;
+import Gui.MainGUI;
+import Gui.SelectSerial;
+import Log.Logger;
+import SerialPort.Port;
 
 class PBControl {
 
@@ -11,7 +12,7 @@ class PBControl {
     }
 
     public PBControl() {
-        /* Voordat we beginnen halen we eerst het OS op én de beschikbare compoorten */
+        /* Voordat we beginnen halen we eerst het OS op ��n de beschikbare compoorten */
         String os = System.getProperty("os.name").toLowerCase();
 
         String serialPort = null;
@@ -31,13 +32,13 @@ class PBControl {
 
 
 
-        /* Er zijn serieële poorten aanwezig, dus we spawnen een GUI */
+        /* Er zijn serie��le poorten aanwezig, dus we spawnen een GUI */
         try {
 
-            /* Voor dat we verder gaan, laten we eerst de serieële poort selecteren */
+            /* Voor dat we verder gaan, laten we eerst de serie��le poort selecteren */
             String[] availablePorts = Port.listPorts();
 
-            /* Als er maar één serieële poort is, selecteren we die */
+            /* Als er maar ����n serie��le poort is, selecteren we die */
             if (availablePorts[0] != null && availablePorts[1] == null) {
                 serialPort = availablePorts[0];
             } else {
@@ -70,13 +71,14 @@ class PBControl {
         Settings settings = new Settings();
         Logger.msg("Info", "Initializing settings");
         settings.setBaudRate(4800);
+        settings.setSender(0);
         settings.setRoundTime(60);
         settings.setRespawnTime(10);
         settings.setCountdownTime(10);
         settings.load();
         Logger.msg("Info", "Game settings loaded. RoundTime: (" + settings.getRoundTime() + "), RespawnTime: (" + settings.getRespawnTime() + ")");
 
-        Control control = new Control(settings, new Port(serialPort, settings.getBaudRate()));
+        Control control = new Control(settings, new Port(serialPort, settings.getBaudRate(), settings.getSender()));
 
         MainGUI maingui = new MainGUI();
         maingui.run(maingui, control);

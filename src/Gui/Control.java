@@ -1,6 +1,8 @@
 package Gui;
 
-import Game.*;
+import Game.Game;
+import Game.Score;
+import Game.Settings;
 import SerialPort.Port;
 
 public class Control {

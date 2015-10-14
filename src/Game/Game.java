@@ -1,7 +1,6 @@
 package Game;
 
 import SerialPort.Port;
-import Log.Logger;
 
 public class Game extends Thread {
 
@@ -58,12 +57,12 @@ public class Game extends Thread {
             if (remainingRoundTime == 0) {
                 this.gameActive = false;
             } else {
-            /* Hier bepalen we hoe veel we slapen tussen elke update */
-            try {
-                this.sleep(800);
-            } catch (InterruptedException e) {
-                break;
-            } catch (Exception e) {}
+                /* Hier bepalen we hoe veel we slapen tussen elke update */
+                try {
+                    this.sleep(800);
+                } catch (InterruptedException e) {
+                    break;
+                } catch (Exception e) {}
             }
 
             /* Pas als de countdown voorbij is gaan we vlaggen pollen */
@@ -72,7 +71,7 @@ public class Game extends Thread {
                 Poll de vlaggen voor hun data
                 Hierbij moeten we voorkomen dat we de vlaggen overspoelen met data,
                 daarom niet elke 800ms pollen
-                */
+                 */
                 if (pollBlocker == 0) {
                     this.port.poll();
                     this.score.pingRequest();
@@ -83,9 +82,9 @@ public class Game extends Thread {
         }
 
         /*
-            We stoppen de timers, halen nog één maal de vlaggen scores
+            We stoppen de timers, halen nog ����n maal de vlaggen scores
             op en stoppen daarna de vlaggen
-        */
+         */
         this.time.end();
         this.port.poll();
         this.port.roundEnd();
@@ -101,7 +100,7 @@ public class Game extends Thread {
     0: blue base
     1: red base
     2: swing base
-    */
+     */
     public void reverseFlag(int flag) {
         this.port.reverseFlag(flag);
     }
@@ -113,7 +112,7 @@ public class Game extends Thread {
     /*
     Reset alle vlaggen naar 0 toe, dit gebeurd ook al als de game start.
     Het kan wenselijk zijn dit tussendoor te doen, zodat er visueel kan worden gecontroleerd of alles werkt
-    */
+     */
     public void reset() {
         this.port.reset();
         this.port.setGameSettings(this.roundtime, this.respawntime, this.countdowntime);
@@ -139,5 +138,5 @@ public class Game extends Thread {
     public int getRemainingCountdownTime() {
         return this.time.getRemainingCountdownTime();
     }
-    
+
 }

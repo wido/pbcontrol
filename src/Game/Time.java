@@ -9,22 +9,22 @@ public class Time extends Thread {
     private Boolean timerActive = true;
 
     public Time(int roundTime, int respawnTime, int countdownTime) {
-    this.roundTime = roundTime;
-    this.respawnTime = respawnTime;
-    this.initialRespawnTime = respawnTime;
-    this.countdownTime = countdownTime;
+        this.roundTime = roundTime;
+        this.respawnTime = respawnTime;
+        this.initialRespawnTime = respawnTime;
+        this.countdownTime = countdownTime;
     }
 
     public synchronized int getRemainingRoundTime() {
-    return this.roundTime;
+        return this.roundTime;
     }
 
     public synchronized int getRemainingRespawnTime() {
-    return this.respawnTime;
+        return this.respawnTime;
     }
 
     public synchronized int getRemainingCountdownTime() {
-    return this.countdownTime;
+        return this.countdownTime;
     }
 
     public void run() {
@@ -46,7 +46,7 @@ public class Time extends Thread {
                 /* Het kan zijn dat er niet een gelijk aantal respawns in een game past,
                    bijv 30 minuten game met 7 minuten respawn.
                    We houden daar rekening mee en laten de respawntijd niet in het negatieve lopen
-                */
+                 */
                 if (this.respawnTime > 0) {
                     this.respawnTime--;
                 } else if ((this.respawnTime == 0) & (this.roundTime > this.initialRespawnTime)) {
@@ -57,7 +57,7 @@ public class Time extends Thread {
     }
 
     public void end() {
-      this.timerActive = false;
+        this.timerActive = false;
     }
 
 }
