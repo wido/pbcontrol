@@ -17,7 +17,7 @@ public class Port {
     private SerialPort serialPort;
     private String port;
     private int baudrate;
-    private int sender;
+    private int baseAddr;
     private InputStream inputStream;
     private OutputStream outputStream;
     private Score score;
@@ -50,10 +50,10 @@ public class Port {
         this.port = port;
     }
 
-    public Port(String port, int baudrate, int sender) {
+    public Port(String port, int baudrate, int baseAddr) {
         this.port = port;
         this.baudrate = baudrate;
-        this.sender = sender;
+        this.baseAddr = baseAddr;
     }
 
     public void setScoreObject(Score score) {
@@ -76,7 +76,7 @@ public class Port {
             this.serialPort.addEventListener(new ScoreReader(this.inputStream, this));
             this.serialPort.notifyOnDataAvailable(true);
 
-            Logger.msg("Info", "Opened serial port: " + this.port + " with baudrate: " + this.baudrate + " and sender: " + this.sender);
+            Logger.msg("Info", "Opened serial port: " + this.port + " with baudrate: " + this.baudrate + " and sender: " + this.baseAddr);
 
         } catch (Exception e) {
             Logger.msg("Error", "Could not open " + this.port + " the message was: " + e.getMessage());
@@ -97,7 +97,7 @@ public class Port {
     /* Stuur start commando naar alle vlaggen */
     public void roundStart() {
         Logger.msg("Info", "Sending start signal to all flags");
-        byte[] startGame = { (byte)238, (byte)255, (byte)255, (byte)sender, 0, 17, 1, 1, 0, (byte)238, (byte)204 };
+        byte[] startGame = { (byte)238, (byte)255, (byte)255, (byte)baseAddr, 0, 17, 1, 1, 0, (byte)238, (byte)204 };
         /* Uit veiligheid sturen we een start en stop 3 keer */
         for (int i = 0; i < 3; i++) {
             this.sendPacket(startGame);
@@ -107,7 +107,7 @@ public class Port {
     /* Stuur het stop commando naar alle vlaggen */
     public void roundEnd() {
         Logger.msg("Info", "Sending stop signal to all flags");
-        byte[] stopGame = { (byte)238, (byte)255, (byte)255, (byte)sender, 0, 17, 1, 2, 0, (byte)238, (byte)204 };
+        byte[] stopGame = { (byte)238, (byte)255, (byte)255, (byte)baseAddr, 0, 17, 1, 2, 0, (byte)238, (byte)204 };
         /* Uit veiligheid sturen we een start en stop 3 keer */
         for (int i = 0; i < 3; i++) {
             this.sendPacket(stopGame);
@@ -120,20 +120,26 @@ public class Port {
     /* Reset de vlaggen, alles op 0 */
     public void reset() {
         Logger.msg("Info", "Resetting all flags");
-        byte[] resetGame = { (byte)238, (byte)255, (byte)255, (byte)sender, 0, 17, 1, 3, 0, (byte)238, (byte)204 };
+        byte[] resetGame = { (byte)238, (byte)255, (byte)255, (byte)baseAddr, 0, 17, 1, 3, 0, (byte)238, (byte)204 };
         this.sendPacket(resetGame);
     }
 
     public void reverseFlag(int destination) {
         Logger.msg("Info", "Sending timereverse to flag: " + destination);
-        byte[] reverseFlag = { (byte)238, (byte)255, (byte)destination, (byte)sender, 0, 64, 1, 3, 0, (byte)238, (byte)204 };
+        byte[] reverseFlag = { (byte)238, (byte)255, (byte)destination, (byte)baseAddr, 0, 64, 1, 3, 0, (byte)238, (byte)204 };
         this.sendPacket(reverseFlag);
     }
 
     public void freezeFlag(int destination) {
         Logger.msg("Info", "Sending freeze to flag: " + destination);
-        byte[] freezeFlag = { (byte)238, (byte)255, (byte)destination, (byte)sender, 0, 64, 1, 0, 0, (byte)238, (byte)204 };
+        byte[] freezeFlag = { (byte)238, (byte)255, (byte)destination, (byte)baseAddr, 0, 64, 1, 0, 0, (byte)238, (byte)204 };
         this.sendPacket(freezeFlag);
+    }
+
+    public void setBaseAddress(int newBase) {
+        Logger.msg("Info", "Setting base address to: " + newBase);
+        byte[] baseaddresspacket = { (byte)238, (byte)255, (byte)255, (byte)baseAddr, 2, 16, 4, 6, 0, (byte)(newBase >> 8), (byte)newBase, 0, (byte)238, (byte)204 };
+        this.sendPacket(baseaddresspacket);
     }
 
     public void setGameSettings(int roundtime, int respawntime, int countdowntime) {
@@ -144,9 +150,9 @@ public class Port {
         short sRespawnTime = new Integer(respawntime).shortValue();
         short sCountDownTime = new Integer(countdowntime).shortValue();
 
-        byte[] roundTimePacket = { (byte)238, (byte)255, (byte)255, (byte)sender, 2, 16, 4, 0, 1, (byte)(sRoundTime >> 8), (byte)sRoundTime, 0, (byte)238, (byte)204 };
-        byte[] respawnTimePacket = { (byte)238, (byte)255, (byte)255, (byte)sender, 2, 16, 4, 1, 1, (byte)(sRespawnTime >> 8), (byte)sRespawnTime, 0, (byte)238, (byte)204 };
-        byte[] countdownTimePacket = { (byte)238, (byte)255, (byte)255, (byte)sender, 2, 16, 4, 2, 0, (byte)(sCountDownTime >> 8), (byte)sCountDownTime, 0, (byte)238, (byte)204 };
+        byte[] roundTimePacket = { (byte)238, (byte)255, (byte)255, (byte)baseAddr, 2, 16, 4, 0, 1, (byte)(sRoundTime >> 8), (byte)sRoundTime, 0, (byte)238, (byte)204 };
+        byte[] respawnTimePacket = { (byte)238, (byte)255, (byte)255, (byte)baseAddr, 2, 16, 4, 1, 1, (byte)(sRespawnTime >> 8), (byte)sRespawnTime, 0, (byte)238, (byte)204 };
+        byte[] countdownTimePacket = { (byte)238, (byte)255, (byte)255, (byte)baseAddr, 2, 16, 4, 2, 0, (byte)(sCountDownTime >> 8), (byte)sCountDownTime, 0, (byte)238, (byte)204 };
 
         this.sendPacket(roundTimePacket);
         try {
@@ -162,7 +168,7 @@ public class Port {
     }
 
     public void poll() {
-        byte[] pollPacket = { (byte)238, (byte)255, (byte)255, (byte)sender, 1, 32, 0, 0, (byte)238, (byte)204 };
+        byte[] pollPacket = { (byte)238, (byte)255, (byte)255, (byte)baseAddr, 1, 32, 0, 0, (byte)238, (byte)204 };
         this.sendPacket(pollPacket);
     }
 
@@ -217,7 +223,7 @@ public class Port {
             return;
         }
 
-        if (destination == 0) {
+        if (destination == baseAddr) {
             switch (command) {
             case 32:
                 switch (sender) {

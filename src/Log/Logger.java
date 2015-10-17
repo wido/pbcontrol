@@ -2,7 +2,7 @@ package Log;
 
 public class Logger {
 
-    static String[] lines = new String[255];
+    static String[] lines = new String[2048];
     static int arrayLength = 0;
 
     public Logger() {}
